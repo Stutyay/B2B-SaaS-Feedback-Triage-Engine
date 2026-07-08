@@ -1,4 +1,4 @@
-# 🔍 Voice of Customer — Feedback Analyser
+# B2B Saas Feedback Triage Engine
 
 > Automatically categorise and sentiment-tag hundreds of app reviews in seconds — not hours.
 
