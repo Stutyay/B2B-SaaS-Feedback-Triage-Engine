@@ -1,10 +1,10 @@
 """
-VoC Feedback Analyser — app.py
+B2B SaaS Feedback Triage Engine — app.py
 =================================
-Uses the stable google-generativeai SDK with gemini-2.0-flash.
+Uses the Groq API with llama-3.1-8b-instant.
 HOW TO RUN:
   1. pip install -r requirements.txt
-  2. Add your Gemini API key on line 30
+  2. Set your GROQ_API_KEY as an environment variable
   3. streamlit run app.py
 """
 
@@ -124,7 +124,7 @@ def analyse_review(client: Groq, review_text: str) -> dict:
 # 3.  PAGE CONFIG
 # ─────────────────────────────────────────────
 st.set_page_config(
-    page_title="VoC Feedback Analyser",
+    page_title="B2B SaaS Feedback Triage Engine",
     page_icon="🔍",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -158,8 +158,8 @@ hr { border-color: #2a3150; }
 # 5.  SIDEBAR
 # ─────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("## 🔍 VoC Analyser")
-    st.caption("Voice of Customer · MVP v1.0")
+    st.markdown("## 🔍 B2B SaaS Feedback Triage Engine")
+    st.caption("B2B Feedback Triage · MVP v1.0")
     st.divider()
     st.markdown("### How to use")
     st.markdown("1. Upload a **CSV file** with a column named `Review`.\n2. Click **Analyse Reviews**.\n3. Explore the dashboard and download results.")
@@ -171,13 +171,13 @@ with st.sidebar:
     for cat, color in CAT_COLORS.items():
         st.markdown(f'<span style="color:{color}; font-weight:600;">■</span> {cat}', unsafe_allow_html=True)
     st.divider()
-    st.caption("Built with Streamlit · Gemini 2.0 Flash")
+    st.caption("Built with Streamlit · Groq (Llama 3.1)")
 
 # ─────────────────────────────────────────────
 # 6.  HEADER
 # ─────────────────────────────────────────────
 st.markdown("""
-<h1 style="font-size:2.2rem;font-weight:700;margin-bottom:0;">🔍 Voice of Customer — Feedback Analyser</h1>
+<h1 style="font-size:2.2rem;font-weight:700;margin-bottom:0;">🔍 B2B SaaS Feedback Triage Engine</h1>
 <p style="color:#8892a4;margin-top:4px;">Upload app reviews → get AI-powered categorisation & sentiment in seconds.</p>
 """, unsafe_allow_html=True)
 st.divider()
@@ -187,7 +187,7 @@ st.divider()
 # ─────────────────────────────────────────────
 api_ready = configure_groq()
 if not api_ready:
-    st.error("⚠️ **Groq API key not found.** Open `app.py` and replace `YOUR_GROQ_API_KEY_HERE` with your key.", icon="🔑")
+    st.error("⚠️ **Groq API key not found.** Set the `GROQ_API_KEY` environment variable and restart the app.", icon="🔑")
     st.stop()
 
 # ─────────────────────────────────────────────
@@ -375,5 +375,5 @@ st.dataframe(
 st.markdown("---")
 csv_export = df_results.to_csv(index=False).encode("utf-8")
 st.download_button(label="⬇️  Download Tagged CSV", data=csv_export,
-                   file_name="voc_analysis_results.csv", mime="text/csv")
-st.caption(f"Processed {total_reviews} reviews in {elapsed:.1f}s · Powered by Gemini 2.0 Flash")
+                    file_name="triaged_feedback.csv", mime="text/csv",
+                    use_container_width=True)
