@@ -159,8 +159,10 @@ GROQ_API_KEY = "your_actual_groq_key_here"
 
 ## 👤 Author
 
-**Stuti Gupta** — Product Manager  
+**Stuti Gupta** — Aspiring Product Manager  
 Built as an MVP to automate B2B feedback triage and demonstrate AI product thinking.
+
+
 ---
 
 ## 📄 License
