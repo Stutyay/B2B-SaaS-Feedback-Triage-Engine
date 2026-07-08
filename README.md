@@ -61,8 +61,8 @@ Upload a CSV of raw product reviews → the app sends each review to an LLM via 
 
 **1. Clone the repository**
 ```bash
-git clone https://github.com/YOUR_USERNAME/voc-analyser.git
-cd voc-analyser
+git clone https://github.com/Stutyay/B2B-SaaS-Feedback-Triage-Engine.git
+cd B2B-SaaS-Feedback-Triage-Engine
 ```
 
 **2. Install dependencies**
@@ -88,7 +88,7 @@ streamlit run app.py
 ## 📁 Project Structure
 
 ```
-voc-analyser/
+B2B-SaaS-Feedback-Triage-Engine/
 │
 ├── app.py               # Main Streamlit application
 ├── requirements.txt     # Python dependencies
@@ -160,8 +160,7 @@ GROQ_API_KEY = "your_actual_groq_key_here"
 ## 👤 Author
 
 **Stuti Gupta** — Product Manager  
-Built as an MVP to automate VoC analysis and demonstrate AI product thinking.
-
+Built as an MVP to automate B2B feedback triage and demonstrate AI product thinking.
 ---
 
 ## 📄 License
