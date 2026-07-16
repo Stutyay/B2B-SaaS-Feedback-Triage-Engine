@@ -1,0 +1,18 @@
+.github/workflows/keep-alive.yml
+
+name: Keep Streamlit App Alive
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping the app
+        run: |
+          curl -sSf https://b2b-saas-feedback-triage-engine-g2d3agdhnfphjn9j8vealj.streamlit.app/ \
+            -o /dev/null \
+            -w "Status: %{http_code}\n"
