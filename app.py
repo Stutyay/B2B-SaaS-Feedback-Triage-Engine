@@ -215,9 +215,16 @@ except Exception as exc:
     st.error(f"Could not parse the CSV file: {exc}")
     st.stop()
 
-if "Review" not in df_raw.columns:
+possible_review_cols = [
+    'Review', 'review', 'text', 'Text', 'content', 'body',
+    'review_text', 'feedback', 'comment'
+]
+review_col = next((c for c in possible_review_cols if c in df_raw.columns), None)
+if review_col is None:
     st.error(f"No **`Review`** column found. Columns in your file: `{list(df_raw.columns)}`")
     st.stop()
+else:
+    df_raw = df_raw.rename(columns={review_col: 'Review'})
 
 df = df_raw[["Review"]].dropna(subset=["Review"]).head(MAX_ROWS).reset_index(drop=True)
 total_reviews = len(df)
