@@ -21,10 +21,13 @@ from groq import Groq
 GROQ_API_KEY  = os.environ.get("GROQ_API_KEY", "")
 
 MODEL_NAME    = "llama-3.1-8b-instant"
-MAX_ROWS      = 50        # ← This is what's missing!
+MAX_ROWS      = 1000
 RETRY_DELAY   = 2
 MAX_WORKERS   = 3
 REQUEST_DELAY = 1
+
+BATCH_SIZE    = 25
+BATCH_DELAY   = 2
 
 VALID_CATEGORIES = {"Bug", "Feature Request", "UX Friction", "Praise"}
 VALID_SENTIMENTS = {"Positive", "Neutral", "Negative"}
@@ -197,12 +200,12 @@ uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"],
     help="The CSV must contain a column named **Review**.")
 
 if uploaded_file is None:
-    st.markdown("""
+    st.markdown(f"""
     <div style="background:#1a2035;border:1.5px dashed #2a3150;border-radius:14px;
     padding:40px;text-align:center;color:#8892a4;margin-top:20px;">
     <div style="font-size:2.5rem;margin-bottom:12px;">📂</div>
     <div style="font-size:1.05rem;font-weight:500;color:#c8d0e0;">Drop a CSV to get started</div>
-    <div style="font-size:0.85rem;margin-top:6px;">Required column: <code>Review</code> · Max 50 rows</div>
+    <div style="font-size:0.85rem;margin-top:6px;">Required column: <code>Review</code> · Max {MAX_ROWS} rows</div>
     </div>""", unsafe_allow_html=True)
     st.stop()
 
@@ -260,24 +263,25 @@ progress_bar  = st.progress(0, text="Starting analysis…")
 status_holder = st.empty()
 completed     = 0
 
-with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-    future_to_idx = {}
-    for idx, review in enumerate(reviews_list):
-        future = executor.submit(analyse_review, client, review)
-        future_to_idx[future] = idx
-        if idx < len(reviews_list) - 1:
-            time.sleep(REQUEST_DELAY)
+for i in range(0, total_reviews, BATCH_SIZE):
+    batch = reviews_list[i:i+BATCH_SIZE]
+    
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+        future_to_idx = {executor.submit(analyse_review, client, review): i + j for j, review in enumerate(batch)}
 
-    for future in as_completed(future_to_idx):
-        idx          = future_to_idx[future]
-        res          = future.result()
-        results[idx] = res
-        if res["category"] == "Unknown":
-            st.warning(f"⚠️ Row {idx+1} — {res['reason'][:120]}")
-        completed += 1
-        progress_bar.progress(completed / total_reviews,
-                               text=f"{completed} / {total_reviews} reviews processed")
-        status_holder.caption(f"✅ {completed} / {total_reviews} analysed…")
+        for future in as_completed(future_to_idx):
+            idx          = future_to_idx[future]
+            res          = future.result()
+            results[idx] = res
+            if res["category"] == "Unknown":
+                st.warning(f"⚠️ Row {idx+1} — {res['reason'][:120]}")
+            completed += 1
+            progress_bar.progress(completed / total_reviews,
+                                   text=f"{completed} / {total_reviews} reviews processed")
+            status_holder.caption(f"✅ {completed} / {total_reviews} analysed…")
+            
+    if i + BATCH_SIZE < total_reviews:
+        time.sleep(BATCH_DELAY)
 
 elapsed = time.time() - start_time
 progress_bar.empty()
